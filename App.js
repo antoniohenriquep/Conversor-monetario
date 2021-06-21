@@ -7,7 +7,10 @@ export default function App() {
   const [moedas, setMoedas] = useState([])
   const [loading, setLoading] = useState(true)
 
-  const [moedaSel, setMoedaSel] = useState(null)
+  const [moedaSelA, setMoedaSelA] = useState(null)
+  const [moedaSelB, setMoedaSelB] = useState(null)
+
+  const [moedaAValor, setMoedaAValor] = useState(0)
   const [moedaBValor, setMoedaBValor] = useState(0)
 
   const [valorMoeda, setValorMoeda] = useState(null)
@@ -28,6 +31,12 @@ export default function App() {
         })
         //console.log(arrayMoedas)
       })
+
+      arrayMoedas.push({
+        key: "BRL",
+        label: "BRL",
+        value: "BRL"
+      })
       
       setMoedas(arrayMoedas)
       setLoading(false)
@@ -39,18 +48,20 @@ export default function App() {
 
 
   async function converter(){
-    alert('teste')
-    if(moedaSel === null ||moedaBValor === 0){
-      alert('Por favor selecione uma moeda')
+    if(moedaSelA === null || moedaSelB === null || moedaBValor === 0){
+      if(moedaSelA === null ||moedaSelB === null)
+        alert('Por favor, selecione uma moeda!')
+      else alert('Por favor, digite uma quantia!')
       return
     }
     //Devolve quanto é um dolar convertido para reais
-    const response = await api.get(`all/${moedaSel}-BRL`)
+    const response = await api.get(`all/${moedaSelA}-${moedaSelB}`)
     //console.log(response.data[moedaSel].ask)
 
-    let resultado = (parseFloat(moedaBValor) * parseFloat(response.data[moedaSel].ask))
-    setValorConv(`R$ ${resultado.toFixed(2)}`)
+    let resultado = (parseFloat(moedaBValor) * parseFloat(response.data[moedaSelA].ask))
+    setValorConv(`${resultado.toFixed(2)} ${moedaSelB}`)
     setValorMoeda(moedaBValor)
+    setMoedaAValor(moedaSelA)
 
     Keyboard.dismiss()
   }
@@ -60,18 +71,25 @@ export default function App() {
     return(<View style ={{flex:1, alignItems:'center', justifyContent:'center',backgroundColor:'#101215'}}>
       <ActivityIndicator color = '#fff' size ={60}/>
     </View>)
-  }else{
+  }
 
-
+  
+  else{
     return (
       <View style = {style.container}>
+        
         <View style = {style.areaMoeda}>
-          <Picker moedas ={moedas} onChange ={(moeda) => setMoedaSel(moeda)}/>
-          <Text style = {style.titulo}>Selecione a moeda:</Text>
+          <Text style = {style.titulo}>Converter de:</Text>
+          <Picker moedas ={moedas} onChange ={(moeda) => setMoedaSelA(moeda)}/>
+        </View>
+
+        <View style = {style.areaMoeda}>
+          <Text style = {style.titulo}>Para:</Text>
+          <Picker moedas ={moedas} onChange ={(moeda) => setMoedaSelB(moeda)}/>
         </View>
 
         <View style ={style.areaValor}>
-          <Text style = {style.titulo}>Digite um valor para converter em R$</Text>
+          <Text style = {style.titulo}>Digite um valor para converter:</Text>
           <TextInput 
           placeholder = 'Ex. 100'
           style ={style.input}
@@ -85,7 +103,7 @@ export default function App() {
 
         {valorConv !== 0 && (
           <View style={style.areaResultado}>
-          <Text style={style.textoResultado}>{valorMoeda} {moedaSel}</Text>
+          <Text style={style.textoResultado}>{valorMoeda} {moedaAValor}</Text>
           <Text style={[style.textoResultado,{fontSize:18,margin:10}]}>Corresponde a:</Text>
           <Text style={style.textoResultado}>{valorConv}</Text>
           </View>

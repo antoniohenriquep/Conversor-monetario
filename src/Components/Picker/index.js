@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import RNPickerSelect from 'react-native-picker-select';
+
 
 export default function Picker(props) {
 
@@ -8,7 +9,7 @@ export default function Picker(props) {
     value: null,
     color:'#000'
   }
-  
+
   return (
     <RNPickerSelect
     placeholder ={placeholder}
